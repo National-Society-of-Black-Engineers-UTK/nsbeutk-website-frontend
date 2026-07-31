@@ -33,7 +33,7 @@ export function OpportunitiesBrowser({ opportunities }: { opportunities: Opportu
           </label>
           <select
             id="opportunities-category"
-            className="min-h-11 rounded-md border border-border-subtle bg-primary/5 px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+            className="min-h-11 rounded-md border border-border-subtle bg-fill-subtle px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
             value={category}
             onChange={(event) => setCategory(event.target.value as "All" | Opportunity["category"])}
           >

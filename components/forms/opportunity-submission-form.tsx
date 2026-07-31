@@ -50,7 +50,7 @@ export function OpportunitySubmissionForm() {
       </Field>
       <Field id="opp-category" label="Category" error={errors.category?.message}>
         <select
-          className="min-h-11 w-full rounded-md border border-border-subtle bg-primary/5 px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+          className="min-h-11 w-full rounded-md border border-border-subtle bg-fill-subtle px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
           {...register("category")}
         >
           {OPPORTUNITY_CATEGORIES.map((category) => (

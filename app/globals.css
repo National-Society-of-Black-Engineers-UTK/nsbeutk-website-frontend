@@ -14,6 +14,7 @@
   --surface: #ffffff;
   --border-subtle: #d1d5db;
   --caption: #6b7280;
+  --fill-subtle: #eef2f5;
 }
 
 .dark {
@@ -22,6 +23,7 @@
   --surface: #1a2d40;
   --border-subtle: #2d4a60;
   --caption: #94a3b8;
+  --fill-subtle: #223a52;
 }
 
 @theme inline {
@@ -30,6 +32,7 @@
   --color-surface: var(--surface);
   --color-border-subtle: var(--border-subtle);
   --color-caption: var(--caption);
+  --color-fill-subtle: var(--fill-subtle);
   --font-sans: var(--font-arimo);
 }
 
