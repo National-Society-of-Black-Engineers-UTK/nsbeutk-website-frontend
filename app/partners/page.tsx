@@ -6,6 +6,10 @@ import { SponsorInquiryForm } from "@/components/forms/sponsor-inquiry-form";
 export const metadata: Metadata = {
   title: "Corporate Partners",
   description: "NSBE UTK sponsor tiers, partnership packet, and sponsor inquiry form.",
+  openGraph: {
+    title: "Corporate Partners",
+    description: "NSBE UTK sponsor tiers, partnership packet, and sponsor inquiry form.",
+  },
 };
 
 export default function PartnersPage() {

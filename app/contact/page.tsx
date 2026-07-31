@@ -4,6 +4,10 @@ import { ContactForm } from "@/components/forms/contact-form";
 export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with NSBE UTK officers and find our social links.",
+  openGraph: {
+    title: "Contact",
+    description: "Get in touch with NSBE UTK officers and find our social links.",
+  },
 };
 
 const OFFICER_CONTACTS = [

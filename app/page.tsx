@@ -10,6 +10,9 @@ import { isUpcoming } from "@/lib/utils/dates";
 
 export const metadata: Metadata = {
   title: "NSBE UTK — National Society of Black Engineers, UT Knoxville",
+  openGraph: {
+    title: "NSBE UTK — National Society of Black Engineers, UT Knoxville",
+  },
 };
 
 const STATS = [

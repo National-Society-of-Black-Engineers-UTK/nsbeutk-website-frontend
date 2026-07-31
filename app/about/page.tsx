@@ -5,6 +5,10 @@ import { getInitials } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "About",
   description: "Learn about NSBE UTK's mission, history, and executive board.",
+  openGraph: {
+    title: "About",
+    description: "Learn about NSBE UTK's mission, history, and executive board.",
+  },
 };
 
 const COMMITTEES = ["Programs", "Corporate Relations", "Academic Excellence", "Public Relations & Historian", "Community Service"] as const;
@@ -50,7 +54,7 @@ export default function AboutPage() {
         <h2 className="text-2xl font-bold text-primary dark:text-secondary">Committees</h2>
         <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {COMMITTEES.map((committee) => (
-            <li key={committee} className="rounded-md bg-primary/10 px-4 py-3 text-sm font-medium text-foreground">
+            <li key={committee} className="rounded-md bg-fill-subtle px-4 py-3 text-sm font-medium text-foreground">
               {committee}
             </li>
           ))}

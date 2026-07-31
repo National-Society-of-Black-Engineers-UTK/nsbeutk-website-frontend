@@ -4,6 +4,10 @@ import { ImageIcon } from "lucide-react";
 export const metadata: Metadata = {
   title: "Gallery",
   description: "Photos from NSBE UTK events and conferences.",
+  openGraph: {
+    title: "Gallery",
+    description: "Photos from NSBE UTK events and conferences.",
+  },
 };
 
 const GALLERY_ITEMS = [

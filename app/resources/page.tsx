@@ -5,6 +5,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 export const metadata: Metadata = {
   title: "Resources",
   description: "Chapter documents: constitution, bylaws, resume templates, and more.",
+  openGraph: {
+    title: "Resources",
+    description: "Chapter documents: constitution, bylaws, resume templates, and more.",
+  },
 };
 
 type ResourceFile = {
@@ -68,6 +72,7 @@ export default function ResourcesPage() {
         </p>
       </section>
 
+      <h2 className="text-2xl font-bold text-primary dark:text-secondary">Chapter documents</h2>
       <Accordion type="multiple" className="max-w-3xl">
         {RESOURCE_FOLDERS.map((folder) => (
           <AccordionItem key={folder.name} value={folder.name}>
@@ -75,7 +80,7 @@ export default function ResourcesPage() {
             <AccordionContent>
               <ul className="flex flex-col gap-3">
                 {folder.files.map((file) => (
-                  <li key={file.name} className="flex items-center justify-between gap-4 rounded-md bg-primary/5 px-4 py-3">
+                  <li key={file.name} className="flex items-center justify-between gap-4 rounded-md bg-fill-subtle px-4 py-3">
                     <span className="flex items-center gap-3 text-sm text-foreground">
                       <FileText className="size-4 shrink-0 text-primary dark:text-secondary" aria-hidden="true" />
                       {file.name}

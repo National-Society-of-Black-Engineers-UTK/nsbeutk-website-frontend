@@ -21,7 +21,6 @@ export const metadata: Metadata = {
   openGraph: {
     title: "NSBE UTK",
     description: "The University of Tennessee, Knoxville chapter of the National Society of Black Engineers.",
-    url: "https://nsbeutk.org",
     siteName: "NSBE UTK",
     locale: "en_US",
     type: "website",

@@ -6,6 +6,10 @@ import { formatDate } from "@/lib/utils/dates";
 export const metadata: Metadata = {
   title: "News",
   description: "Announcements, member spotlights, and recap posts from NSBE UTK.",
+  openGraph: {
+    title: "News",
+    description: "Announcements, member spotlights, and recap posts from NSBE UTK.",
+  },
 };
 
 export default function NewsPage() {

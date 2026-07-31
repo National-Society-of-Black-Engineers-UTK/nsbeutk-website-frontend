@@ -22,6 +22,10 @@ export async function generateMetadata({ params }: NewsPostPageProps): Promise<M
   return {
     title: post.title,
     description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+    },
   };
 }
 

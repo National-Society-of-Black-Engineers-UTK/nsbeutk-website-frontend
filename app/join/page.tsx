@@ -5,6 +5,10 @@ import { JoinInterestForm } from "@/components/forms/join-interest-form";
 export const metadata: Metadata = {
   title: "Join NSBE",
   description: "How to join NSBE UTK: national and local membership, benefits, and FAQ.",
+  openGraph: {
+    title: "Join NSBE",
+    description: "How to join NSBE UTK: national and local membership, benefits, and FAQ.",
+  },
 };
 
 const BENEFITS = [
@@ -51,7 +55,7 @@ export default function JoinPage() {
         <h2 className="text-2xl font-bold text-primary dark:text-secondary">Member benefits</h2>
         <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {BENEFITS.map((benefit) => (
-            <li key={benefit} className="rounded-md bg-primary/10 px-4 py-3 text-sm text-foreground">
+            <li key={benefit} className="rounded-md bg-fill-subtle px-4 py-3 text-sm text-foreground">
               {benefit}
             </li>
           ))}

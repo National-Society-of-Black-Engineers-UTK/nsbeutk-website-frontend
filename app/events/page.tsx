@@ -6,6 +6,10 @@ import { isUpcoming } from "@/lib/utils/dates";
 export const metadata: Metadata = {
   title: "Events",
   description: "Upcoming and past NSBE UTK events, RSVPs, and points earned per event.",
+  openGraph: {
+    title: "Events",
+    description: "Upcoming and past NSBE UTK events, RSVPs, and points earned per event.",
+  },
 };
 
 export default function EventsPage() {

@@ -6,6 +6,10 @@ import { opportunities } from "@/lib/data/opportunities";
 export const metadata: Metadata = {
   title: "Opportunities",
   description: "Internships, scholarships, research, and more submitted by the NSBE UTK community.",
+  openGraph: {
+    title: "Opportunities",
+    description: "Internships, scholarships, research, and more submitted by the NSBE UTK community.",
+  },
 };
 
 export default function OpportunitiesPage() {
@@ -20,6 +24,7 @@ export default function OpportunitiesPage() {
       </section>
 
       <section>
+        <h2 className="text-2xl font-bold text-primary dark:text-secondary">Browse opportunities</h2>
         <OpportunitiesBrowser opportunities={opportunities} />
       </section>
 
