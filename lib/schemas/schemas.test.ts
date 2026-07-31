@@ -113,4 +113,19 @@ describe("opportunitySubmissionSchema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("rejects a javascript: URL", () => {
+    const result = opportunitySubmissionSchema.safeParse({
+      title: "Data Analyst Intern",
+      company: "Example Corp",
+      category: "Internship",
+      deadline: "2026-12-01",
+      eligibility: "Sophomore or above",
+      description: "A summer internship on the analytics team.",
+      url: "javascript:alert(1)",
+      submitterName: "Jordan Williams",
+      submitterEmail: "jordan@example.com",
+    });
+    expect(result.success).toBe(false);
+  });
 });

@@ -8,7 +8,10 @@ export const opportunitySubmissionSchema = z.object({
   deadline: z.string().min(1, "Select a deadline."),
   eligibility: z.string().min(2, "Describe eligibility requirements."),
   description: z.string().min(10, "Add a short description."),
-  url: z.string().url("Enter a valid URL."),
+  url: z
+    .string()
+    .url("Enter a valid URL.")
+    .refine((value) => /^https?:\/\//i.test(value), "Enter an http(s) URL."),
   submitterName: z.string().min(2, "Enter your name."),
   submitterEmail: z.string().email("Enter a valid email address."),
 });
