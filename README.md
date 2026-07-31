@@ -25,3 +25,14 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Updating content
 
 Sample content lives in `lib/data/` (events, officers, sponsors, news, opportunities) — edit those files directly until a real CMS is wired up in a later phase.
+
+## Before going live
+
+Everything on this site is currently sample/placeholder content and must be replaced before a real deploy:
+
+- All content in `lib/data/` (events, officers, sponsors, news, opportunities) is fictional
+- The `STATS` array in `app/page.tsx` (member/event/opportunity/partner counts) is hardcoded, not live data
+- Every `https://example.com` link (sponsor websites, social links, opportunity apply links) is a placeholder
+- Officer emails in `app/contact/page.tsx` follow a plausible-but-unverified pattern (`nsbe-president@utk.edu`, etc.) — confirm these are real before publishing
+
+This build also makes two deliberate deviations from the original design spec, documented in `docs/superpowers/plans/2026-07-30-phase-1-public-site.md`'s Global Constraints: Arimo is used in place of Arial (a real web font substitute), and the UI component layer is hand-built on Radix primitives + Tailwind rather than the shadcn/ui CLI.
