@@ -7,8 +7,12 @@ export type IcsEventInput = {
   endsAt: string;
 };
 
-function toIcsDate(iso: string): string {
+function toIcsUtcTimestamp(iso: string): string {
   return new Date(iso).toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+}
+
+function toIcsFloatingTime(iso: string): string {
+  return new Date(iso).toISOString().replace(/[-:]/g, "").split(".")[0];
 }
 
 function escapeIcsText(value: string): string {
@@ -26,9 +30,9 @@ export function buildIcsContent(event: IcsEventInput): string {
     "PRODID:-//NSBE UTK//Website//EN",
     "BEGIN:VEVENT",
     `UID:${event.uid}@nsbeutk.org`,
-    `DTSTAMP:${toIcsDate(new Date().toISOString())}`,
-    `DTSTART:${toIcsDate(event.startsAt)}`,
-    `DTEND:${toIcsDate(event.endsAt)}`,
+    `DTSTAMP:${toIcsUtcTimestamp(new Date().toISOString())}`,
+    `DTSTART:${toIcsFloatingTime(event.startsAt)}`,
+    `DTEND:${toIcsFloatingTime(event.endsAt)}`,
     `SUMMARY:${escapeIcsText(event.title)}`,
     `DESCRIPTION:${escapeIcsText(event.description)}`,
     `LOCATION:${escapeIcsText(event.location)}`,

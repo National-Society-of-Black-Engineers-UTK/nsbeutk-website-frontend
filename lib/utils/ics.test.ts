@@ -16,8 +16,8 @@ describe("buildIcsContent", () => {
     expect(content).toContain("BEGIN:VEVENT");
     expect(content).toContain("SUMMARY:Fall Kickoff GBM");
     expect(content).toContain("UID:fall-kickoff-gbm@nsbeutk.org");
-    expect(content).toContain("DTSTART:20260827T180000Z");
-    expect(content).toContain("DTEND:20260827T190000Z");
+    expect(content).toContain("DTSTART:20260827T180000");
+    expect(content).toContain("DTEND:20260827T190000");
     expect(content).toContain("END:VEVENT");
     expect(content).toContain("END:VCALENDAR");
   });
