@@ -55,7 +55,9 @@ docs or the product spec's AI-prompt snippets maps to `proxy.ts` here.
 
 One new table, created via a SQL migration file checked into the repo
 (`supabase/migrations/0001_profiles.sql`) that you run once in the Supabase SQL editor (this
-phase doesn't include Supabase CLI/local-dev tooling — out of scope):
+phase doesn't include Supabase CLI/local-dev tooling — out of scope). The authoritative version
+of this SQL is that migration file — read it, not this doc, when actually running anything;
+this section exists to explain intent, not to be copy-pasted:
 
 ```sql
 create table profiles (
@@ -74,6 +76,14 @@ create policy "profiles are readable by authenticated users"
   to authenticated
   using (true);
 
+-- A user can create their own profile row (self-provisioning on first login) —
+-- no service-role key anywhere in this phase, so this INSERT policy is required
+-- or every first login fails with an RLS violation.
+create policy "users can insert their own profile"
+  on profiles for insert
+  to authenticated
+  with check (auth.uid() = id);
+
 -- A user can update their own full_name, but not their own role
 create policy "users can update their own name"
   on profiles for update
@@ -86,14 +96,12 @@ create policy "officers can update any profile"
   on profiles for update
   to authenticated
   using (exists (select 1 from profiles p where p.id = auth.uid() and p.role = 'officer'));
-
--- Row insertion happens via a server action using the service role, not client-side
 ```
 
-The policies above are illustrative of intent (self-service name edits, role changes
-officer-only); Postgres's exact behavior with multiple permissive `UPDATE` policies on the same
-table will be verified against a real Supabase project during implementation, not assumed
-correct from this draft.
+The policies above are illustrative of intent (self-service provisioning, self-service name
+edits, role changes officer-only); Postgres's exact behavior with multiple permissive `UPDATE`
+policies on the same table will be verified against a real Supabase project during
+implementation, not assumed correct from this draft.
 
 Note: `role` isn't stored in Supabase Auth's JWT/`app_metadata` (as §8's AI-prompt snippets
 show) because that requires a service-role call on every role change and JWT refresh to
