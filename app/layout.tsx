@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { getCurrentProfile } from "@/lib/auth/dal";
 
 const arimo = Arimo({
   variable: "--font-arimo",
@@ -37,12 +38,15 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const profile = await getCurrentProfile();
+  const user = profile ? { email: profile.email, role: profile.role } : null;
+
   return (
     <html lang="en" className={arimo.variable} suppressHydrationWarning>
       <body className="flex min-h-full flex-col antialiased">
         <ThemeProvider>
-          <SiteHeader />
+          <SiteHeader user={user} />
           <main className="flex-1">{children}</main>
           <SiteFooter />
         </ThemeProvider>

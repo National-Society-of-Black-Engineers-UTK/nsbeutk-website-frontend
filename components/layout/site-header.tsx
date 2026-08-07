@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { SignOutButton } from "@/components/shared/sign-out-button";
 
 const NAV_LINKS = [
   { href: "/about", label: "About" },
@@ -19,9 +20,18 @@ const NAV_LINKS = [
   { href: "/contact", label: "Contact" },
 ] as const;
 
-export function SiteHeader() {
+export type SiteHeaderUser = { email: string; role: "member" | "officer" } | null;
+
+export function SiteHeader({ user }: { user: SiteHeaderUser }) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
+  const authLink = user
+    ? {
+        href: user.role === "officer" ? "/officer" : "/portal",
+        label: user.role === "officer" ? "Officer" : "Portal",
+      }
+    : { href: "/login", label: "Log In" };
 
   return (
     <header className="sticky top-0 z-40 bg-primary text-white">
@@ -46,6 +56,16 @@ export function SiteHeader() {
               </Link>
             );
           })}
+          <Link
+            href={authLink.href}
+            className={cn(
+              "text-sm font-medium hover:text-secondary",
+              pathname === authLink.href && "text-secondary underline underline-offset-4"
+            )}
+          >
+            {authLink.label}
+          </Link>
+          {user ? <SignOutButton /> : null}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -80,6 +100,23 @@ export function SiteHeader() {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link
+                href={authLink.href}
+                className={cn(
+                  "block min-h-11 py-3 text-base font-medium hover:text-secondary",
+                  pathname === authLink.href && "text-secondary"
+                )}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {authLink.label}
+              </Link>
+            </li>
+            {user ? (
+              <li className="py-3">
+                <SignOutButton />
+              </li>
+            ) : null}
           </ul>
         </nav>
       ) : null}
