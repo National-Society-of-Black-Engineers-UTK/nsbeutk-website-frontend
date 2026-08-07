@@ -42,6 +42,12 @@ See `docs/superpowers/specs/2026-08-06-phase-2-auth-design.md` for the full auth
 that spec's linked plan for one-time Supabase dashboard configuration (allowed email domain,
 redirect URLs) required before login works.
 
+### Database setup
+
+Run `supabase/migrations/0001_profiles.sql` once in your Supabase project's SQL Editor
+(Dashboard → SQL Editor → New query → paste → Run). It creates the `profiles` table that backs
+both `/portal` and `/officer`.
+
 ## Before going live
 
 Everything on this site is currently sample/placeholder content and must be replaced before a real deploy:
