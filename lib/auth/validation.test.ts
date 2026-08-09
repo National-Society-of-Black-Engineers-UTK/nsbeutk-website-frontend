@@ -29,4 +29,12 @@ describe("isUtkEmail", () => {
   it("rejects an empty string", () => {
     expect(isUtkEmail("")).toBe(false);
   });
+
+  it("accepts a vols.utk.edu address", () => {
+    expect(isUtkEmail("student@vols.utk.edu")).toBe(true);
+  });
+
+  it("rejects a lookalike vols domain", () => {
+    expect(isUtkEmail("student@fakevols.utk.edu")).toBe(false);
+  });
 });

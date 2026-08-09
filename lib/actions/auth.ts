@@ -22,7 +22,7 @@ export async function signInWithMagicLink(
   const next = String(formData.get("next") ?? "/portal");
 
   if (!isUtkEmail(email)) {
-    return { status: "error", message: "Enter a valid @utk.edu email address." };
+    return { status: "error", message: "Enter a valid UTK email address (@utk.edu or @vols.utk.edu)." };
   }
 
   const supabase = await createClient();

@@ -32,9 +32,9 @@ Copy `.env.example` to `.env.local` and fill in:
 
 - `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` — from your Supabase project's
   Settings → API page.
-- `OFFICER_SEED_EMAILS` — comma-separated `@utk.edu` addresses to auto-promote to the officer
-  role on first login. Only matters for bootstrapping the very first officer(s); afterwards use
-  the Officer Dashboard's roster to promote/demote.
+- `OFFICER_SEED_EMAILS` — comma-separated UTK email addresses (`@utk.edu` or `@vols.utk.edu`) to
+  auto-promote to the officer role on first login. Only matters for bootstrapping the very first
+  officer(s); afterwards use the Officer Dashboard's roster to promote/demote.
 
 The same three variables must also be set in the Vercel project settings for deploys.
 
