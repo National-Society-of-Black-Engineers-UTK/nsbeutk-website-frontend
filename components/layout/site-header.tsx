@@ -65,7 +65,7 @@ export function SiteHeader({ user }: { user: SiteHeaderUser }) {
           >
             {authLink.label}
           </Link>
-          {user ? <SignOutButton /> : null}
+          {user ? <SignOutButton variant="outlineOnPrimary" /> : null}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -114,7 +114,7 @@ export function SiteHeader({ user }: { user: SiteHeaderUser }) {
             </li>
             {user ? (
               <li className="py-3">
-                <SignOutButton />
+                <SignOutButton variant="outlineOnPrimary" />
               </li>
             ) : null}
           </ul>
