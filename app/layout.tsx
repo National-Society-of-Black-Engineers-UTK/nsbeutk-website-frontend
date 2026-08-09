@@ -39,7 +39,7 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const profile = await getCurrentProfile();
+  const profile = await getCurrentProfile().catch(() => null);
   const user = profile ? { email: profile.email, role: profile.role } : null;
 
   return (

@@ -42,11 +42,15 @@ export async function ensureProfile(
   supabase: SupabaseClient,
   user: { id: string; email: string }
 ): Promise<Profile> {
-  const { data: existing } = await supabase
+  const { data: existing, error: selectError } = await supabase
     .from("profiles")
     .select(PROFILE_COLUMNS)
     .eq("id", user.id)
     .maybeSingle();
+
+  if (selectError) {
+    throw new Error(`Failed to read profile for ${user.email}: ${selectError.message}`);
+  }
 
   if (existing) {
     return profileFromRow(existing as ProfileRow);
@@ -55,14 +59,37 @@ export async function ensureProfile(
   const seedEmails = getOfficerSeedEmails();
   const role: MemberRole = seedEmails.includes(user.email.toLowerCase()) ? "officer" : "member";
 
-  const { data: created, error } = await supabase
+  const { data: created, error: insertError } = await supabase
     .from("profiles")
     .insert({ id: user.id, email: user.email, role })
     .select(PROFILE_COLUMNS)
     .single();
 
-  if (error || !created) {
-    throw new Error(`Failed to create profile for ${user.email}: ${error?.message ?? "unknown error"}`);
+  if (insertError) {
+    // Two concurrent first-logins can race on the INSERT; the loser hits a
+    // unique-violation on the primary key. Re-read instead of failing, since
+    // the row now genuinely exists.
+    if (insertError.code === "23505") {
+      const { data: retried, error: retryError } = await supabase
+        .from("profiles")
+        .select(PROFILE_COLUMNS)
+        .eq("id", user.id)
+        .single();
+
+      if (retryError || !retried) {
+        throw new Error(
+          `Failed to read profile for ${user.email} after insert conflict: ${retryError?.message ?? "unknown error"}`
+        );
+      }
+
+      return profileFromRow(retried as ProfileRow);
+    }
+
+    throw new Error(`Failed to create profile for ${user.email}: ${insertError.message}`);
+  }
+
+  if (!created) {
+    throw new Error(`Failed to create profile for ${user.email}: unknown error`);
   }
 
   return profileFromRow(created as ProfileRow);
