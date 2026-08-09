@@ -4,3 +4,7 @@ export function isUtkEmail(email: string): boolean {
   const normalized = email.trim().toLowerCase();
   return UTK_EMAIL_DOMAINS.some((domain) => normalized.endsWith(domain));
 }
+
+export function isSafeNextPath(path: string): boolean {
+  return path.startsWith("/") && !path.startsWith("//");
+}

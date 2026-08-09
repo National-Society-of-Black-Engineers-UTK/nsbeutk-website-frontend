@@ -1,10 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ensureProfile } from "@/lib/auth/profile";
-
-function isSafeNextPath(path: string): boolean {
-  return path.startsWith("/") && !path.startsWith("//");
-}
+import { isSafeNextPath } from "@/lib/auth/validation";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);

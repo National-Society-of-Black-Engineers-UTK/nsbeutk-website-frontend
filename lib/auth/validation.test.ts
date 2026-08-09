@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isUtkEmail } from "./validation";
+import { isSafeNextPath, isUtkEmail } from "./validation";
 
 describe("isUtkEmail", () => {
   it("accepts a plain utk.edu address", () => {
@@ -36,5 +36,35 @@ describe("isUtkEmail", () => {
 
   it("rejects a lookalike vols domain", () => {
     expect(isUtkEmail("student@fakevols.utk.edu")).toBe(false);
+  });
+});
+
+describe("isSafeNextPath", () => {
+  it("accepts a same-origin relative path", () => {
+    expect(isSafeNextPath("/portal")).toBe(true);
+  });
+
+  it("accepts a nested relative path", () => {
+    expect(isSafeNextPath("/officer/roster")).toBe(true);
+  });
+
+  it("rejects a protocol-relative path (open redirect)", () => {
+    expect(isSafeNextPath("//evil.com")).toBe(false);
+  });
+
+  it("rejects an absolute URL", () => {
+    expect(isSafeNextPath("https://evil.com")).toBe(false);
+  });
+
+  it("rejects a userinfo-style open redirect", () => {
+    expect(isSafeNextPath("@evil.com")).toBe(false);
+  });
+
+  it("rejects a path not starting with a slash", () => {
+    expect(isSafeNextPath("evil.com")).toBe(false);
+  });
+
+  it("rejects an empty string", () => {
+    expect(isSafeNextPath("")).toBe(false);
   });
 });
