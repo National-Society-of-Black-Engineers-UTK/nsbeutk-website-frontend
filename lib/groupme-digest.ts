@@ -6,14 +6,12 @@ import { buildDigestMessage } from "@/lib/groupme-messages";
 
 export async function runGroupMeDigest(): Promise<{ posted: number }> {
   const supabase = createServiceClient();
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
   const { data, error } = await supabase
     .from("opportunities")
     .select("id, title, company, deadline, url")
     .eq("status", "approved")
-    .is("posted_to_groupme_at", null)
-    .gte("created_at", sevenDaysAgo);
+    .is("posted_to_groupme_at", null);
 
   if (error) {
     throw new Error(`Failed to load opportunities for GroupMe digest: ${error.message}`);

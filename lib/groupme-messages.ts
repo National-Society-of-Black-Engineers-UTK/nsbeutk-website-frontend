@@ -13,7 +13,7 @@ export function buildSingleOpportunityMessage(opportunity: GroupMeOpportunity): 
     `💼 ${opportunity.title} — ${opportunity.company}`,
     `📅 Deadline: ${formatDate(opportunity.deadline)}`,
     `🔗 ${opportunity.url}`,
-    "Submit yours: nsbeutk.org/opportunities/submit",
+    "Submit yours: nsbeutk.org/opportunities",
   ].join("\n");
 }
 

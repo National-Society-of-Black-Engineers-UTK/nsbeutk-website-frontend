@@ -49,9 +49,22 @@ export async function approveOpportunity(formData: FormData): Promise<void> {
 
   const supabase = await createClient();
 
-  const { error: updateError } = await supabase.from("opportunities").update({ status: "approved" }).eq("id", id);
+  const { data: updated, error: updateError } = await supabase
+    .from("opportunities")
+    .update({ status: "approved" })
+    .eq("id", id)
+    .eq("status", "pending")
+    .select("id");
   if (updateError) {
     throw new Error(`Failed to approve opportunity: ${updateError.message}`);
+  }
+
+  if (!updated || updated.length === 0) {
+    // Someone else already approved this row (double-click, or the officer dashboard
+    // open in two tabs); the request that actually won the race already handled it.
+    revalidatePath("/officer");
+    revalidatePath("/opportunities");
+    return;
   }
 
   const { data: opportunity, error: fetchError } = await supabase
@@ -63,7 +76,13 @@ export async function approveOpportunity(formData: FormData): Promise<void> {
   if (!fetchError && opportunity) {
     const posted = await postToGroupMe(buildSingleOpportunityMessage(opportunity as GroupMeOpportunity));
     if (posted) {
-      await supabase.from("opportunities").update({ posted_to_groupme_at: new Date().toISOString() }).eq("id", id);
+      const { error: stampError } = await supabase
+        .from("opportunities")
+        .update({ posted_to_groupme_at: new Date().toISOString() })
+        .eq("id", id);
+      if (stampError) {
+        console.error(`Failed to record posted_to_groupme_at for opportunity ${id}: ${stampError.message}`);
+      }
     }
   }
 

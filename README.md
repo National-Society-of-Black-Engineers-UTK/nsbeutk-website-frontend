@@ -35,8 +35,14 @@ Copy `.env.example` to `.env.local` and fill in:
 - `OFFICER_SEED_EMAILS` — comma-separated UTK email addresses (`@utk.edu` or `@vols.utk.edu`) to
   auto-promote to the officer role on first login. Only matters for bootstrapping the very first
   officer(s); afterwards use the Officer Dashboard's roster to promote/demote.
+- `SUPABASE_SERVICE_ROLE_KEY` — from the same Settings → API page. Bypasses Row Level Security;
+  only ever read server-side, for the GroupMe digest cron job. Never expose this to the client.
+- `GROUPME_BOT_ID` — the Bot ID for the chapter's GroupMe group, from dev.groupme.com. The bot
+  must already be registered against the group; this app only posts to it, it doesn't create one.
+- `CRON_SECRET` — a random shared secret that Vercel Cron sends as a Bearer token when it calls
+  `/api/cron/groupme-digest`, so the route can reject non-Vercel callers.
 
-The same three variables must also be set in the Vercel project settings for deploys.
+The same six variables must also be set in the Vercel project settings for deploys.
 
 See `docs/superpowers/specs/2026-08-06-phase-2-auth-design.md` for the full auth design, and
 that spec's linked plan for one-time Supabase dashboard configuration (allowed email domain,
@@ -47,6 +53,10 @@ redirect URLs) required before login works.
 Run `supabase/migrations/0001_profiles.sql` once in your Supabase project's SQL Editor
 (Dashboard → SQL Editor → New query → paste → Run). It creates the `profiles` table that backs
 both `/portal` and `/officer`.
+
+Run `supabase/migrations/0002_opportunities.sql` the same way (Supabase SQL Editor) before the
+Opportunities Hub features will work. It creates the `opportunities` table that backs
+`/opportunities` and the officer approval queue.
 
 ## Before going live
 

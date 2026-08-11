@@ -17,7 +17,7 @@ describe("buildSingleOpportunityMessage", () => {
         "💼 Software Engineering Intern — Meridian Systems\n" +
         "📅 Deadline: September 15, 2026\n" +
         "🔗 https://example.com\n" +
-        "Submit yours: nsbeutk.org/opportunities/submit"
+        "Submit yours: nsbeutk.org/opportunities"
     );
   });
 });
