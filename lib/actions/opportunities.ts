@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 import { requireOfficer } from "@/lib/auth/dal";
 import { postToGroupMe } from "@/lib/groupme";
 import { buildSingleOpportunityMessage, type GroupMeOpportunity } from "@/lib/groupme-messages";
+import { runGroupMeDigest } from "@/lib/groupme-digest";
 
 export type SubmitOpportunityResult = { status: "success" } | { status: "error"; message: string };
 
@@ -87,4 +88,10 @@ export async function rejectOpportunity(formData: FormData): Promise<void> {
 
   revalidatePath("/officer");
   revalidatePath("/opportunities");
+}
+
+export async function postGroupMeDigestNow(): Promise<void> {
+  await requireOfficer();
+  await runGroupMeDigest();
+  revalidatePath("/officer");
 }
