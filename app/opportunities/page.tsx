@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { OpportunitiesBrowser } from "@/components/opportunities/opportunities-browser";
 import { OpportunitySubmissionForm } from "@/components/forms/opportunity-submission-form";
-import { opportunities } from "@/lib/data/opportunities";
+import { createClient } from "@/lib/supabase/server";
+import type { Opportunity } from "@/lib/data/opportunities";
 
 export const metadata: Metadata = {
   title: "Opportunities",
@@ -12,7 +13,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function OpportunitiesPage() {
+export default async function OpportunitiesPage() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("public_opportunities")
+    .select("id, title, company, category, deadline, eligibility, description, url")
+    .order("deadline", { ascending: true });
+
+  if (error) {
+    throw new Error(`Failed to load opportunities: ${error.message}`);
+  }
+
+  const opportunities = (data ?? []) as Opportunity[];
+
   return (
     <div className="mx-auto flex max-w-[1280px] flex-col gap-16 px-6 py-16">
       <section className="max-w-3xl">
