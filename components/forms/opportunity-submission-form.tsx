@@ -10,9 +10,12 @@ import { Field } from "@/components/ui/field";
 import { FormSuccess } from "@/components/shared/form-success";
 import { OPPORTUNITY_CATEGORIES } from "@/lib/data/opportunities";
 import { opportunitySubmissionSchema, type OpportunitySubmissionFormValues } from "@/lib/schemas/opportunity-submission";
+import { submitOpportunity } from "@/lib/actions/opportunities";
 
 export function OpportunitySubmissionForm() {
   const [submitted, setSubmitted] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState<string | undefined>(undefined);
+  const honeypotRef = React.useRef<HTMLInputElement>(null);
   const {
     register,
     handleSubmit,
@@ -40,8 +43,24 @@ export function OpportunitySubmissionForm() {
     );
   }
 
+  async function onSubmit(values: OpportunitySubmissionFormValues) {
+    setSubmitError(undefined);
+    const result = await submitOpportunity(values, honeypotRef.current?.value ?? "");
+
+    if (result.status === "error") {
+      setSubmitError(result.message);
+      return;
+    }
+
+    setSubmitted(true);
+  }
+
   return (
-    <form onSubmit={handleSubmit(() => setSubmitted(true))} className="flex flex-col gap-4" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
+      <div className="absolute left-[-9999px]" aria-hidden="true">
+        <label htmlFor="opp-website">Leave this field blank</label>
+        <input ref={honeypotRef} id="opp-website" name="website" tabIndex={-1} autoComplete="off" />
+      </div>
       <Field id="opp-title" label="Title" error={errors.title?.message}>
         <Input {...register("title")} />
       </Field>
@@ -78,8 +97,13 @@ export function OpportunitySubmissionForm() {
       <Field id="opp-submitter-email" label="Your email" error={errors.submitterEmail?.message}>
         <Input type="email" {...register("submitterEmail")} />
       </Field>
+      {submitError ? (
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+          {submitError}
+        </p>
+      ) : null}
       <Button type="submit" disabled={isSubmitting}>
-        Submit opportunity
+        {isSubmitting ? "Submitting..." : "Submit opportunity"}
       </Button>
     </form>
   );
