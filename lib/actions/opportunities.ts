@@ -6,6 +6,10 @@ import {
   type OpportunitySubmissionFormValues,
 } from "@/lib/schemas/opportunity-submission";
 import { buildOpportunityInsertPayload } from "@/lib/utils/opportunities-payload";
+import { revalidatePath } from "next/cache";
+import { requireOfficer } from "@/lib/auth/dal";
+import { postToGroupMe } from "@/lib/groupme";
+import { buildSingleOpportunityMessage, type GroupMeOpportunity } from "@/lib/groupme-messages";
 
 export type SubmitOpportunityResult = { status: "success" } | { status: "error"; message: string };
 
@@ -32,4 +36,55 @@ export async function submitOpportunity(
   }
 
   return { status: "success" };
+}
+
+export async function approveOpportunity(formData: FormData): Promise<void> {
+  await requireOfficer();
+  const id = String(formData.get("id") ?? "");
+
+  if (!id) {
+    throw new Error("Missing opportunity id.");
+  }
+
+  const supabase = await createClient();
+
+  const { error: updateError } = await supabase.from("opportunities").update({ status: "approved" }).eq("id", id);
+  if (updateError) {
+    throw new Error(`Failed to approve opportunity: ${updateError.message}`);
+  }
+
+  const { data: opportunity, error: fetchError } = await supabase
+    .from("opportunities")
+    .select("title, company, deadline, url")
+    .eq("id", id)
+    .single();
+
+  if (!fetchError && opportunity) {
+    const posted = await postToGroupMe(buildSingleOpportunityMessage(opportunity as GroupMeOpportunity));
+    if (posted) {
+      await supabase.from("opportunities").update({ posted_to_groupme_at: new Date().toISOString() }).eq("id", id);
+    }
+  }
+
+  revalidatePath("/officer");
+  revalidatePath("/opportunities");
+}
+
+export async function rejectOpportunity(formData: FormData): Promise<void> {
+  await requireOfficer();
+  const id = String(formData.get("id") ?? "");
+
+  if (!id) {
+    throw new Error("Missing opportunity id.");
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("opportunities").update({ status: "rejected" }).eq("id", id);
+
+  if (error) {
+    throw new Error(`Failed to reject opportunity: ${error.message}`);
+  }
+
+  revalidatePath("/officer");
+  revalidatePath("/opportunities");
 }
