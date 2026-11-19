@@ -22,7 +22,7 @@ export default async function OfficerPage() {
 
   const { data: pendingOpportunities, error: pendingError } = await supabase
     .from("opportunities")
-    .select("id, title, company, category, deadline, submitted_by_name, submitted_by_email")
+    .select("id, title, company, category, deadline, description, eligibility, url, submitted_by_name, submitted_by_email")
     .eq("status", "pending")
     .order("created_at", { ascending: true });
 

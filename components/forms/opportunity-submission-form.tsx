@@ -56,7 +56,7 @@ export function OpportunitySubmissionForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
+    <form onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="flex flex-col gap-4" noValidate>
       <div className="absolute left-[-9999px]" aria-hidden="true">
         <label htmlFor="opp-website">Leave this field blank</label>
         <input ref={honeypotRef} id="opp-website" name="website" tabIndex={-1} autoComplete="off" />

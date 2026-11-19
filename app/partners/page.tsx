@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
+import { chapter } from "@/lib/data/chapter";
 import { Badge } from "@/components/ui/badge";
-import { sponsors, SPONSOR_TIERS } from "@/lib/data/sponsors";
-import { SponsorInquiryForm } from "@/components/forms/sponsor-inquiry-form";
+import { SPONSOR_TIERS } from "@/lib/data/sponsors";
 
 export const metadata: Metadata = {
   title: "Corporate Partners",
-  description: "NSBE UTK sponsor tiers, partnership packet, and sponsor inquiry form.",
+  description: "Learn about partnering with NSBE UTK.",
   openGraph: {
     title: "Corporate Partners",
-    description: "NSBE UTK sponsor tiers, partnership packet, and sponsor inquiry form.",
+    description: "Learn about partnering with NSBE UTK.",
   },
 };
 
 export default function PartnersPage() {
+  const { sponsors, partnershipPacketUrl, sponsorshipEmail } = chapter;
+
   return (
     <div className="mx-auto flex max-w-[1280px] flex-col gap-16 px-6 py-16">
       <section className="max-w-3xl">
@@ -21,12 +23,16 @@ export default function PartnersPage() {
           Our corporate partners make NSBE UTK&apos;s programming possible. Partner with us to
           connect your organization with talented Black engineering students at UT Knoxville.
         </p>
-        <a
-          href="https://example.com"
-          className="mt-4 inline-block text-sm font-bold text-primary underline hover:text-secondary dark:text-secondary"
-        >
-          Download partnership packet (PDF)
-        </a>
+        {partnershipPacketUrl ? (
+          <a href={partnershipPacketUrl} className="mt-4 inline-block font-bold text-primary underline dark:text-secondary">
+            Download partnership packet
+          </a>
+        ) : null}
+        {sponsorshipEmail ? (
+          <a href={`mailto:${sponsorshipEmail}`} className="mt-4 block font-bold text-primary underline dark:text-secondary">
+            Contact us about sponsorship
+          </a>
+        ) : null}
       </section>
 
       {SPONSOR_TIERS.map((tier) => {
@@ -55,16 +61,6 @@ export default function PartnersPage() {
         );
       })}
 
-      <section className="max-w-xl">
-        <h2 className="text-2xl font-bold text-primary dark:text-secondary">Sponsor inquiry</h2>
-        <p className="mt-2 text-sm text-caption">
-          Interested in sponsoring NSBE UTK? Send us a message and our Corporate Relations Chair
-          will follow up.
-        </p>
-        <div className="mt-6">
-          <SponsorInquiryForm />
-        </div>
-      </section>
     </div>
   );
 }

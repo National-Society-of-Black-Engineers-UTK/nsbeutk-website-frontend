@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import { chapter } from "@/lib/data/chapter";
 import Link from "next/link";
-import { newsPosts } from "@/lib/data/news";
 import { formatDate } from "@/lib/utils/dates";
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default function NewsPage() {
-  const posts = [...newsPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  const posts = [...chapter.newsPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 
   return (
     <div className="mx-auto flex max-w-[1280px] flex-col gap-8 px-6 py-16">
@@ -21,6 +21,8 @@ export default function NewsPage() {
         <h1 className="text-3xl font-bold text-primary dark:text-secondary sm:text-4xl">News</h1>
         <p className="mt-4 text-base text-foreground">Announcements and stories from the chapter.</p>
       </section>
+
+      {posts.length === 0 ? <p className="text-sm text-caption">No chapter news has been posted yet.</p> : null}
 
       <div className="flex flex-col divide-y divide-border-subtle">
         {posts.map((post) => (

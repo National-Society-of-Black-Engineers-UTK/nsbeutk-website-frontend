@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 import { isSafeNextPath, isUtkEmail } from "./validation";
 
 describe("isUtkEmail", () => {
+  it.each(["@utk.edu", "a@@utk.edu", "first last@utk.edu", "a\n@utk.edu"])("rejects malformed address %j", (email) => {
+    expect(isUtkEmail(email)).toBe(false);
+  });
+
   it("accepts a plain utk.edu address", () => {
     expect(isUtkEmail("student@utk.edu")).toBe(true);
   });
@@ -40,6 +44,10 @@ describe("isUtkEmail", () => {
 });
 
 describe("isSafeNextPath", () => {
+  it.each(["/\\evil.com", "/\n/evil.com", "/\t/evil.com", "/\r/evil.com"])("rejects URL normalization bypass %j", (path) => {
+    expect(isSafeNextPath(path)).toBe(false);
+  });
+
   it("accepts a same-origin relative path", () => {
     expect(isSafeNextPath("/portal")).toBe(true);
   });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, isDeadlineSoon, isUpcoming } from "./dates";
+import { formatDate, formatDateTime, isDeadlineSoon, isUpcoming, opportunityDeadlineCutoff } from "./dates";
 
 describe("formatDate", () => {
   it("formats an ISO date as a long-form US date", () => {
@@ -32,5 +32,22 @@ describe("isDeadlineSoon", () => {
 
   it("returns false for a deadline that already passed", () => {
     expect(isDeadlineSoon("2025-12-30T00:00:00Z", now)).toBe(false);
+  });
+});
+
+describe("formatDateTime", () => {
+  it("shows Eastern daylight time and the local date across UTC midnight", () => {
+    expect(formatDateTime("2026-08-28T01:00:00Z")).toBe("August 27, 2026 · 9:00 PM EDT");
+  });
+
+  it("shows Eastern standard time in winter", () => {
+    expect(formatDateTime("2026-01-10T23:00:00Z")).toBe("January 10, 2026 · 6:00 PM EST");
+  });
+});
+
+describe("opportunityDeadlineCutoff", () => {
+  it("keeps same-day deadlines active until midnight in Knoxville", () => {
+    expect(opportunityDeadlineCutoff(new Date("2026-08-28T03:59:59Z"))).toBe("2026-08-27T00:00:00.000Z");
+    expect(opportunityDeadlineCutoff(new Date("2026-08-28T04:00:00Z"))).toBe("2026-08-28T00:00:00.000Z");
   });
 });

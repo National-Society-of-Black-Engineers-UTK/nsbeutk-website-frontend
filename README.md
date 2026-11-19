@@ -2,7 +2,7 @@
 
 The public-facing website for the NSBE UTK chapter (National Society of Black Engineers, University of Tennessee, Knoxville).
 
-This is Phase 1 of the platform described in `docs/superpowers/specs/2026-07-30-phase-1-public-site-design.md`: a complete public site with the full brand design system, all public pages, and fully-built forms. There is no backend yet — forms end in a client-side success state and content lives in `lib/data/`. Later phases (CMS/auth, QR check-in, analytics, sponsor/alumni portals) are separate specs.
+The platform includes the public site, Supabase magic-link authentication, a member portal, an officer dashboard, and moderated opportunity submissions with GroupMe notifications. Public content is configured in `lib/data/chapter.ts`. The soft launch hides contact, join, sponsorship, and RSVP forms. Configure verified links and email addresses to give visitors direct ways to reach the chapter.
 
 ## Getting Started
 
@@ -12,6 +12,10 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+Turbopack's persistent development cache is disabled in `next.config.ts` to avoid
+cache-restoration panics and stale client manifests across server restarts.
+Development still uses Turbopack, with caching in memory during each session.
 
 ## Scripts
 
@@ -24,7 +28,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Updating content
 
-Sample content lives in `lib/data/` (events, officers, sponsors, news, opportunities) — edit those files directly until a real CMS is wired up in a later phase.
+Add chapter-approved officers, sponsors, events, stats, news, and links in `lib/data/chapter.ts`. Empty sections are hidden or show a brief availability message. Use timestamps with explicit UTC offsets for event start and end times. Event times display in Eastern Time.
 
 ## Environment variables (Phase 2: auth)
 
@@ -36,7 +40,7 @@ Copy `.env.example` to `.env.local` and fill in:
   auto-promote to the officer role on first login. Only matters for bootstrapping the very first
   officer(s); afterwards use the Officer Dashboard's roster to promote/demote.
 - `SUPABASE_SERVICE_ROLE_KEY` — from the same Settings → API page. Bypasses Row Level Security;
-  only ever read server-side, for the GroupMe digest cron job. Never expose this to the client.
+  only ever read server-side, for opportunity submission, GroupMe delivery, and initial officer provisioning. Never expose this to the client.
 - `GROUPME_BOT_ID` — the Bot ID for the chapter's GroupMe group, from dev.groupme.com. The bot
   must already be registered against the group; this app only posts to it, it doesn't create one.
 - `CRON_SECRET` — a random shared secret that Vercel Cron sends as a Bearer token when it calls
@@ -58,13 +62,31 @@ Run `supabase/migrations/0002_opportunities.sql` the same way (Supabase SQL Edit
 Opportunities Hub features will work. It creates the `opportunities` table that backs
 `/opportunities` and the officer approval queue.
 
+Then run `supabase/migrations/0003_profile_policy_hardening.sql`. This is required for
+both new and existing databases: it blocks self-assigned officer roles, prevents recursive
+profile update policies, and limits roster visibility to officers. Seed officers are
+provisioned server-side using `SUPABASE_SERVICE_ROLE_KEY`.
+
+Run `supabase/migrations/0004_hide_expired_opportunities.sql` to hide expired
+opportunities from the public database view. Date-only deadlines remain active
+through the end of that day in Eastern Time.
+
+Apply `0005_opportunity_submission_permissions.sql`, `0006_officer_role_safeguard.sql`,
+and `0007_groupme_delivery.sql` in order before deploying Phase 2. Test against a staging
+copy first. Migration `0005` validates existing field lengths, URL shape, and finite
+deadlines, so correct any incompatible legacy rows before applying it. Existing
+expired deadlines remain valid historical data. On an existing project, review the
+officer roster before release because the counter starts from the current roles.
+
+The GroupMe cron reports an error when a delivery attempt fails. Explicit rejections
+can be retried by the next digest. If a request times out, the provider returns an
+ambiguous error, or the worker stops before recording the outcome, check the staging
+or chapter GroupMe before retrying. For an `uncertain` claim or a stale `pending` claim,
+confirm no worker is still active and reconcile the whole claim by `claim_id`:
+mark it `failed` if no message was delivered, or set its rows to `sent` and the matching
+`opportunities.posted_to_groupme_at` timestamps in the same transaction if it was delivered.
+
 ## Before going live
 
-Everything on this site is currently sample/placeholder content and must be replaced before a real deploy:
-
-- All content in `lib/data/` (events, officers, sponsors, news, opportunities) is fictional
-- The `STATS` array in `app/page.tsx` (member/event/opportunity/partner counts) is hardcoded, not live data
-- Every `https://example.com` link (sponsor websites, social links, opportunity apply links) is a placeholder
-- Officer emails in `app/contact/page.tsx` follow a plausible-but-unverified pattern (`nsbe-president@utk.edu`, etc.) — confirm these are real before publishing
-
-This build also makes two deliberate deviations from the original design spec, documented in `docs/superpowers/plans/2026-07-30-phase-1-public-site.md`'s Global Constraints: Arimo is used in place of Arial (a real web font substitute), and the UI component layer is hand-built on Radix primitives + Tailwind rather than the shadcn/ui CLI.
+Populate the chapter content config with approved data and verify each published URL
+and email address. Check that the production database has all seven migrations.

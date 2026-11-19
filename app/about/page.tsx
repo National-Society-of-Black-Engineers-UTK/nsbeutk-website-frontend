@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { officers } from "@/lib/data/officers";
+import { chapter } from "@/lib/data/chapter";
 import { getInitials } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -11,9 +11,9 @@ export const metadata: Metadata = {
   },
 };
 
-const COMMITTEES = ["Programs", "Corporate Relations", "Academic Excellence", "Public Relations & Historian", "Community Service"] as const;
-
 export default function AboutPage() {
+  const { officers, committees } = chapter;
+
   return (
     <div className="mx-auto flex max-w-[1280px] flex-col gap-16 px-6 py-16">
       <section className="max-w-3xl">
@@ -30,36 +30,40 @@ export default function AboutPage() {
         </p>
       </section>
 
-      <section>
-        <h2 className="text-2xl font-bold text-primary dark:text-secondary">Executive board</h2>
-        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {officers.map((officer) => (
-            <div key={officer.id} className="flex items-center gap-4 rounded-lg border border-border-subtle bg-surface p-6">
-              <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-white dark:bg-secondary dark:text-black">
-                {getInitials(officer.name)}
+      {officers.length > 0 ? (
+        <section>
+          <h2 className="text-2xl font-bold text-primary dark:text-secondary">Executive board</h2>
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {officers.map((officer) => (
+              <div key={officer.id} className="flex items-center gap-4 rounded-lg border border-border-subtle bg-surface p-6">
+                <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-white dark:bg-secondary dark:text-black">
+                  {getInitials(officer.name)}
+                </div>
+                <div>
+                  <p className="font-bold text-primary dark:text-secondary">{officer.name}</p>
+                  <p className="text-sm text-caption">{officer.role}</p>
+                  <p className="text-sm text-caption">
+                    {officer.major} · {officer.year}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-bold text-primary dark:text-secondary">{officer.name}</p>
-                <p className="text-sm text-caption">{officer.role}</p>
-                <p className="text-sm text-caption">
-                  {officer.major} · {officer.year}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
-      <section>
-        <h2 className="text-2xl font-bold text-primary dark:text-secondary">Committees</h2>
-        <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {COMMITTEES.map((committee) => (
-            <li key={committee} className="rounded-md bg-fill-subtle px-4 py-3 text-sm font-medium text-foreground">
-              {committee}
-            </li>
-          ))}
-        </ul>
-      </section>
+      {committees.length > 0 ? (
+        <section>
+          <h2 className="text-2xl font-bold text-primary dark:text-secondary">Committees</h2>
+          <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {committees.map((committee) => (
+              <li key={committee} className="rounded-md bg-fill-subtle px-4 py-3 text-sm font-medium text-foreground">
+                {committee}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </div>
   );
 }

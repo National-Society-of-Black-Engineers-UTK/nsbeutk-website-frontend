@@ -12,39 +12,72 @@ describe("postToGroupMe", () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 202 }));
     vi.stubGlobal("fetch", fetchMock);
 
-    const result = await postToGroupMe("hello chapter");
-
-    expect(result).toBe(true);
+    await expect(postToGroupMe("hello chapter")).resolves.toBeUndefined();
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.groupme.com/v3/bots/post",
       expect.objectContaining({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bot_id: "test-bot-id", text: "hello chapter" }),
+        signal: expect.any(AbortSignal),
       })
     );
   });
 
-  it("returns false when the GroupMe API responds with an error status", async () => {
+  it("holds a claim when GroupMe returns an ambiguous server error", async () => {
     vi.stubEnv("GROUPME_BOT_ID", "test-bot-id");
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 500 })));
 
-    expect(await postToGroupMe("hello chapter")).toBe(false);
+    await expect(postToGroupMe("hello chapter")).rejects.toMatchObject({
+      statusCode: 502,
+      outcome: "uncertain",
+    });
   });
 
-  it("returns false when GROUPME_BOT_ID is not set", async () => {
+  it("allows retry after an explicit rejection", async () => {
+    vi.stubEnv("GROUPME_BOT_ID", "test-bot-id");
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 429 })));
+
+    await expect(postToGroupMe("hello chapter")).rejects.toMatchObject({
+      statusCode: 502,
+      outcome: "failed",
+    });
+  });
+
+  it("fails before sending when GROUPME_BOT_ID is not set", async () => {
     vi.stubEnv("GROUPME_BOT_ID", "");
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
-    expect(await postToGroupMe("hello chapter")).toBe(false);
+    await expect(postToGroupMe("hello chapter")).rejects.toMatchObject({
+      statusCode: 500,
+      outcome: "failed",
+    });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("returns false when the fetch call throws", async () => {
+  it("holds a claim when the connection drops", async () => {
     vi.stubEnv("GROUPME_BOT_ID", "test-bot-id");
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network down")));
 
-    expect(await postToGroupMe("hello chapter")).toBe(false);
+    await expect(postToGroupMe("hello chapter")).rejects.toMatchObject({
+      statusCode: 502,
+      outcome: "uncertain",
+    });
+  });
+
+  it("reports a gateway timeout without making the claim retryable", async () => {
+    vi.stubEnv("GROUPME_BOT_ID", "test-bot-id");
+    const timeout = vi.spyOn(AbortSignal, "timeout").mockReturnValue(AbortSignal.abort());
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("timed out")));
+    try {
+      await expect(postToGroupMe("hello chapter")).rejects.toMatchObject({
+        statusCode: 504,
+        outcome: "uncertain",
+      });
+      expect(timeout).toHaveBeenCalledWith(8_000);
+    } finally {
+      timeout.mockRestore();
+    }
   });
 });

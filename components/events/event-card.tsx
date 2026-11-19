@@ -2,7 +2,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { formatDateTime, isUpcoming } from "@/lib/utils/dates";
 import { POINTS_BY_EVENT_TYPE, type NsbeEvent } from "@/lib/data/events";
-import { RsvpDialog } from "./rsvp-dialog";
+import { AddToCalendarButton } from "./add-to-calendar-button";
+import { buttonVariants } from "@/components/ui/button";
 
 export function EventCard({ event }: { event: NsbeEvent }) {
   const upcoming = isUpcoming(event.endsAt);
@@ -18,7 +19,7 @@ export function EventCard({ event }: { event: NsbeEvent }) {
           </span>
         </div>
         <h3 className="text-lg font-bold text-primary dark:text-secondary">{event.title}</h3>
-        <p className="text-sm text-caption">{formatDateTime(event.startsAt)}</p>
+        <time dateTime={event.startsAt} className="text-sm text-caption">{formatDateTime(event.startsAt)}</time>
         <a
           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
           target="_blank"
@@ -30,12 +31,17 @@ export function EventCard({ event }: { event: NsbeEvent }) {
         <p className="text-sm text-foreground">{event.description}</p>
 
         <div className="mt-auto flex flex-wrap gap-3 pt-2">
-          {upcoming && event.rsvpEnabled ? (
-            <RsvpDialog event={event} />
+          {upcoming ? (
+            <>
+              {event.volinkUrl ? (
+                <a href={event.volinkUrl} className={buttonVariants({ variant: "primary" })}>
+                  View event on VOLink
+                </a>
+              ) : null}
+              <AddToCalendarButton event={event} />
+            </>
           ) : (
-            <span className="text-sm font-medium text-caption">
-              {upcoming ? "RSVP closed" : "This event has passed"}
-            </span>
+            <span className="text-sm font-medium text-caption">This event has passed</span>
           )}
         </div>
       </div>

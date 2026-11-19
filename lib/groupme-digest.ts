@@ -1,45 +1,52 @@
-// lib/groupme-digest.ts
 import "server-only";
+
+import { randomUUID } from "node:crypto";
 import { createServiceClient } from "@/lib/supabase/service";
-import { postToGroupMe } from "@/lib/groupme";
-import { buildDigestMessage } from "@/lib/groupme-messages";
+import { GroupMeDeliveryError, postToGroupMe } from "@/lib/groupme";
+import {
+  buildDigestMessage,
+  buildSingleOpportunityMessage,
+  type GroupMeOpportunity,
+} from "@/lib/groupme-messages";
 
-export async function runGroupMeDigest(): Promise<{ posted: number }> {
+export async function runGroupMeDigest(opportunityId?: string): Promise<{ posted: number }> {
   const supabase = createServiceClient();
-
-  const { data, error } = await supabase
-    .from("opportunities")
-    .select("id, title, company, deadline, url")
-    .eq("status", "approved")
-    .is("posted_to_groupme_at", null);
+  const batchId = randomUUID();
+  const { data, error } = await supabase.rpc("claim_groupme_deliveries", {
+    batch_id: batchId,
+    target_id: opportunityId ?? null,
+  });
 
   if (error) {
-    throw new Error(`Failed to load opportunities for GroupMe digest: ${error.message}`);
+    throw new Error(`Failed to claim GroupMe deliveries: ${error.message}`);
   }
 
-  const opportunities = data ?? [];
-
+  const opportunities: GroupMeOpportunity[] = data ?? [];
   if (opportunities.length === 0) {
     return { posted: 0 };
   }
 
-  const posted = await postToGroupMe(buildDigestMessage(opportunities));
+  const message = opportunityId
+    ? buildSingleOpportunityMessage(opportunities[0])
+    : buildDigestMessage(opportunities);
 
-  if (!posted) {
-    return { posted: 0 };
+  let failure: GroupMeDeliveryError | undefined;
+  try {
+    await postToGroupMe(message);
+  } catch (error) {
+    if (!(error instanceof GroupMeDeliveryError)) throw error;
+    failure = error;
   }
 
-  const { error: updateError } = await supabase
-    .from("opportunities")
-    .update({ posted_to_groupme_at: new Date().toISOString() })
-    .in(
-      "id",
-      opportunities.map((opportunity) => opportunity.id)
-    );
+  const { error: finishError } = await supabase.rpc("finish_groupme_deliveries", {
+    batch_id: batchId,
+    outcome: failure?.outcome ?? "sent",
+  });
 
-  if (updateError) {
-    throw new Error(`Failed to mark opportunities as posted: ${updateError.message}`);
+  if (finishError) {
+    throw new Error(`Failed to record GroupMe delivery ${batchId}: ${finishError.message}`, { cause: failure });
   }
+  if (failure) throw failure;
 
   return { posted: opportunities.length };
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { JoinInterestForm } from "@/components/forms/join-interest-form";
+import { chapter } from "@/lib/data/chapter";
 
 export const metadata: Metadata = {
   title: "Join NSBE",
@@ -74,13 +74,11 @@ export default function JoinPage() {
         </Accordion>
       </section>
 
-      <section className="max-w-xl">
-        <h2 className="text-2xl font-bold text-primary dark:text-secondary">Interest form</h2>
-        <p className="mt-2 text-sm text-caption">Tell us a bit about yourself and an officer will reach out with next steps.</p>
-        <div className="mt-6">
-          <JoinInterestForm />
-        </div>
-      </section>
+      {chapter.joinLink ? (
+        <a href={chapter.joinLink.href} className="font-bold text-primary underline dark:text-secondary">
+          {chapter.joinLink.label}
+        </a>
+      ) : null}
     </div>
   );
 }

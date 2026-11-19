@@ -11,16 +11,12 @@ function toIcsUtcTimestamp(iso: string): string {
   return new Date(iso).toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 }
 
-function toIcsFloatingTime(iso: string): string {
-  return new Date(iso).toISOString().replace(/[-:]/g, "").split(".")[0];
-}
-
 function escapeIcsText(value: string): string {
   return value
     .replace(/\\/g, "\\\\")
     .replace(/,/g, "\\,")
     .replace(/;/g, "\\;")
-    .replace(/\n/g, "\\n");
+    .replace(/\r\n|\r|\n/g, "\\n");
 }
 
 export function buildIcsContent(event: IcsEventInput): string {
@@ -31,8 +27,8 @@ export function buildIcsContent(event: IcsEventInput): string {
     "BEGIN:VEVENT",
     `UID:${event.uid}@nsbeutk.org`,
     `DTSTAMP:${toIcsUtcTimestamp(new Date().toISOString())}`,
-    `DTSTART:${toIcsFloatingTime(event.startsAt)}`,
-    `DTEND:${toIcsFloatingTime(event.endsAt)}`,
+    `DTSTART:${toIcsUtcTimestamp(event.startsAt)}`,
+    `DTEND:${toIcsUtcTimestamp(event.endsAt)}`,
     `SUMMARY:${escapeIcsText(event.title)}`,
     `DESCRIPTION:${escapeIcsText(event.description)}`,
     `LOCATION:${escapeIcsText(event.location)}`,
