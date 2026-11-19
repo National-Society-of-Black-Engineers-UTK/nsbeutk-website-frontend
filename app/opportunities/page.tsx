@@ -1,3 +1,4 @@
+import { opportunityDeadlineCutoff } from "@/lib/utils/dates";
 import type { Metadata } from "next";
 import { OpportunitiesBrowser } from "@/components/opportunities/opportunities-browser";
 import { OpportunitySubmissionForm } from "@/components/forms/opportunity-submission-form";
@@ -18,6 +19,7 @@ export default async function OpportunitiesPage() {
   const { data, error } = await supabase
     .from("public_opportunities")
     .select("id, title, company, category, deadline, eligibility, description, url")
+    .gte("deadline", opportunityDeadlineCutoff())
     .order("deadline", { ascending: true });
 
   if (error) {

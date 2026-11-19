@@ -10,6 +10,9 @@ type PendingOpportunity = {
   company: string;
   category: string;
   deadline: string;
+  description: string;
+  eligibility: string;
+  url: string;
   submitted_by_name: string;
   submitted_by_email: string;
 };
@@ -35,6 +38,16 @@ export function PendingOpportunities({ opportunities }: { opportunities: Pending
           <p className="text-sm text-caption">Deadline: {formatDate(opportunity.deadline)}</p>
           <p className="text-sm text-caption">
             Submitted by {opportunity.submitted_by_name} ({opportunity.submitted_by_email})
+          </p>
+          <p className="whitespace-pre-wrap break-words text-sm text-foreground">{opportunity.description}</p>
+          <p className="break-words text-sm text-foreground">Eligibility: {opportunity.eligibility}</p>
+          <p className="break-all text-sm text-foreground">
+            Destination URL:{" "}
+            {/^https?:\/\//i.test(opportunity.url) ? (
+              <a href={opportunity.url} target="_blank" rel="noopener noreferrer" className="underline">
+                {opportunity.url}
+              </a>
+            ) : opportunity.url}
           </p>
           <div className="mt-2 flex gap-3">
             <form action={approveOpportunity}>

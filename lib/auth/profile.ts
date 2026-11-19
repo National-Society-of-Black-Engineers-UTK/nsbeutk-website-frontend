@@ -1,5 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { createServiceClient } from "@/lib/supabase/service";
+import { isUtkEmail } from "@/lib/auth/validation";
 
 export type MemberRole = "member" | "officer";
 
@@ -42,6 +44,9 @@ export async function ensureProfile(
   supabase: SupabaseClient,
   user: { id: string; email: string }
 ): Promise<Profile> {
+  if (!isUtkEmail(user.email)) {
+    throw new Error("A verified UTK email address is required.");
+  }
   const { data: existing, error: selectError } = await supabase
     .from("profiles")
     .select(PROFILE_COLUMNS)
@@ -59,7 +64,10 @@ export async function ensureProfile(
   const seedEmails = getOfficerSeedEmails();
   const role: MemberRole = seedEmails.includes(user.email.toLowerCase()) ? "officer" : "member";
 
-  const { data: created, error: insertError } = await supabase
+  // Seed promotion is trusted server configuration; ordinary clients may only
+  // provision member profiles under the database policy.
+  const insertClient = role === "officer" ? createServiceClient() : supabase;
+  const { data: created, error: insertError } = await insertClient
     .from("profiles")
     .insert({ id: user.id, email: user.email, role })
     .select(PROFILE_COLUMNS)

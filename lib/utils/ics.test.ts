@@ -2,6 +2,20 @@ import { describe, expect, it } from "vitest";
 import { buildIcsContent } from "./ics";
 
 describe("buildIcsContent", () => {
+  it("preserves offset timestamps and escapes Windows line endings", () => {
+    const content = buildIcsContent({
+      uid: "offset-event",
+      title: "Workshop",
+      description: "First line\r\nSecond line\rThird line",
+      location: "Student Union",
+      startsAt: "2026-08-27T18:00:00-04:00",
+      endsAt: "2026-08-27T19:00:00-04:00",
+    });
+    expect(content).toContain("DTSTART:20260827T220000Z\r\n");
+    expect(content).toContain("DTEND:20260827T230000Z\r\n");
+    expect(content).toContain("DESCRIPTION:First line\\nSecond line\\nThird line\r\n");
+  });
+
   it("includes required VEVENT fields", () => {
     const content = buildIcsContent({
       uid: "fall-kickoff-gbm",
@@ -16,8 +30,8 @@ describe("buildIcsContent", () => {
     expect(content).toContain("BEGIN:VEVENT");
     expect(content).toContain("SUMMARY:Fall Kickoff GBM");
     expect(content).toContain("UID:fall-kickoff-gbm@nsbeutk.org");
-    expect(content).toContain("DTSTART:20260827T180000");
-    expect(content).toContain("DTEND:20260827T190000");
+    expect(content).toContain("DTSTART:20260827T180000Z\r\n");
+    expect(content).toContain("DTEND:20260827T190000Z\r\n");
     expect(content).toContain("END:VEVENT");
     expect(content).toContain("END:VCALENDAR");
   });

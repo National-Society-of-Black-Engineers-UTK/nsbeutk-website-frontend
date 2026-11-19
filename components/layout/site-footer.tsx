@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail } from "lucide-react";
+import { chapter } from "@/lib/data/chapter";
 
 const FOOTER_LINKS = [
   { href: "/about", label: "About" },
@@ -21,17 +21,20 @@ export function SiteFooter() {
           <p className="mt-2 max-w-xs text-sm text-white/70">
             The University of Tennessee, Knoxville chapter of the National Society of Black Engineers.
           </p>
-          <div className="mt-4 flex items-center gap-4">
-            <a href="https://example.com" className="text-sm font-bold hover:text-secondary">
-              Instagram
-            </a>
-            <a href="https://example.com" className="text-sm font-bold hover:text-secondary">
-              LinkedIn
-            </a>
-            <a href="mailto:nsbe@utk.edu" className="hover:text-secondary" aria-label="Email">
-              <Mail className="size-5" />
-            </a>
-          </div>
+          {chapter.socials.length > 0 || chapter.email ? (
+            <div className="mt-4 flex flex-wrap items-center gap-4">
+              {chapter.socials.map((social) => (
+                <a key={social.href} href={social.href} className="text-sm font-bold hover:text-secondary">
+                  {social.label}
+                </a>
+              ))}
+              {chapter.email ? (
+                <a href={`mailto:${chapter.email}`} className="text-sm font-bold hover:text-secondary">
+                  Email
+                </a>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
         <nav aria-label="Footer">

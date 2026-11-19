@@ -1,28 +1,29 @@
 import type { Metadata } from "next";
+import { chapter } from "@/lib/data/chapter";
 import { EventCard } from "@/components/events/event-card";
-import { events } from "@/lib/data/events";
 import { isUpcoming } from "@/lib/utils/dates";
 
 export const metadata: Metadata = {
   title: "Events",
-  description: "Upcoming and past NSBE UTK events, RSVPs, and points earned per event.",
+  description: "Upcoming and past NSBE UTK events.",
   openGraph: {
     title: "Events",
-    description: "Upcoming and past NSBE UTK events, RSVPs, and points earned per event.",
+    description: "Upcoming and past NSBE UTK events.",
   },
 };
 
 export default function EventsPage() {
-  const upcoming = events.filter((event) => isUpcoming(event.endsAt)).sort((a, b) => a.startsAt.localeCompare(b.startsAt));
-  const past = events.filter((event) => !isUpcoming(event.endsAt)).sort((a, b) => b.startsAt.localeCompare(a.startsAt));
+  const { events } = chapter;
+  const now = new Date();
+  const upcoming = events.filter((event) => isUpcoming(event.endsAt, now)).sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));
+  const past = events.filter((event) => !isUpcoming(event.endsAt, now)).sort((a, b) => Date.parse(b.startsAt) - Date.parse(a.startsAt));
 
   return (
     <div className="mx-auto flex max-w-[1280px] flex-col gap-16 px-6 py-16">
       <section className="max-w-3xl">
         <h1 className="text-3xl font-bold text-primary dark:text-secondary sm:text-4xl">Events</h1>
         <p className="mt-4 text-base text-foreground">
-          RSVP to upcoming events and add them to your calendar. Attendance is tracked toward
-          stole eligibility once QR check-in launches.
+          Browse chapter events and add upcoming dates to your calendar.
         </p>
       </section>
 
